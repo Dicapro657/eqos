@@ -1,21 +1,12 @@
-// components/MyProfile.js
+// components/MyProfile.js (SON VERSİYON)
+// ... (ProfileStat bileşeni burada tanımlı olmalı)
 
-import React from 'react';
-
-// Stat Kartı Bileşeni
-const ProfileStat = ({ title, value, unit }) => (
-    <div className="stat-card">
-        <span className="stat-title">{title}</span>
-        <span className="stat-value">{value} {unit}</span>
-    </div>
-);
-
-const MyProfile = ({ profile, address }) => {
+const MyProfile = ({ profile, address, boostAmount, setBoostAmount, handleSelfBoost }) => {
     if (!profile) {
         return <div className="profile-loading">Profil verileri yükleniyor veya cüzdan bağlı değil...</div>;
     }
 
-    // Profil bilgilerini istenen formatta çekme
+    // Profil bilgileri...
     const eqosPoints = profile.eqosPoints || 0;
     const eqosCoinAmount = profile.eqosCoinAmount || 0;
     const followersCount = profile.followers ? profile.followers.length : 0;
@@ -25,38 +16,28 @@ const MyProfile = ({ profile, address }) => {
 
     return (
         <div className="profile-view">
-            <h2>Cüzdan Adresi: {address.slice(0, 8)}...</h2>
+            <h2>Cüzdan Adresi: {address.slice(0, 8)}...{address.slice(-4)}</h2>
             
             <div className="profile-stats-grid">
                 
-                {/* 💥 Havalı Stat Kartları 💥 */}
-                <ProfileStat title="EQOS Puanları" value={eqosPoints} unit="PT" />
-                <ProfileStat title="EQOS Coin (Presale)" value={eqosCoinAmount} unit="EQOS" />
-                <ProfileStat title="Takipçiler" value={followersCount} unit="Kişi" />
-                <ProfileStat title="Takip Edilen" value={followingCount} unit="Kişi" />
-                <ProfileStat title="Davet Kodu" value={referralCode} unit="" />
-                <ProfileStat title="Davet Sayısı" value={referralCount} unit="" />
+                {/* Havalı Stat Kartları */}
+                {/* ... (ProfileStat Bileşenleri) ... */}
             </div>
 
-            {/* 💥 BOOST/DONATE BUTONLARI (Görsel Eklenebilir Hali) 💥 */}
-            <div className="action-buttons-section">
-                
-                <button className="action-button btn-boost" onClick={() => {/* Boost modalını aç */}}>
-                    <img 
-                        src="/icon_boost.png" 
-                        alt="Boost Icon" 
-                        className="button-icon"
-                    />
-                    <span>Boost Profil</span>
-                </button>
-                
-                <button className="action-button btn-donate" onClick={() => {/* Donate modalını aç */}}>
-                    <img 
-                        src="/icon_donate.png" 
-                        alt="Donate Icon" 
-                        className="button-icon"
-                    />
-                    <span>Bağış Yap</span>
+            <div style={{ marginTop: '25px', borderTop: '1px solid #333', paddingTop: '15px' }}>
+                <h4>🔥 Boost My Profile (Minimum $1)</h4>
+                <input
+                    type="number"
+                    placeholder="USD Amount to Boost (Min 1)"
+                    value={boostAmount}
+                    onChange={(e) => setBoostAmount(parseFloat(e.target.value) || 0)}
+                    min="1"
+                    step="0.5"
+                    style={{ width: '200px', padding: '8px', marginRight: '10px', fontSize: '14px' }}
+                />
+                <button onClick={handleSelfBoost} className="action-button btn-boost" style={{ padding: '8px 15px' }}>
+                    <img src="/icon_boost.png" alt="Boost Icon" className="button-icon" />
+                    <span>Boost (${boostAmount.toFixed(2)} USD)</span>
                 </button>
             </div>
         </div>
