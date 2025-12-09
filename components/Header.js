@@ -1,10 +1,9 @@
-// components/Header.js
+// components/Header.js (FINAL & ENGLISH VERSION)
 
 import React from 'react';
 
 const Header = ({ currentView, setView, isConnected, address, handleConnectWallet }) => { 
     
-    // Navigasyon sekmeleri
     const views = [
         { key: 'myprofile', label: 'My Profile' },
         { key: 'profiles', label: 'Profiles' },
@@ -12,13 +11,12 @@ const Header = ({ currentView, setView, isConnected, address, handleConnectWalle
         { key: 'refwallet', label: 'RefWallet' } 
     ];
 
-    // Address kısaltması
-    const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Cüzdan Bağla';
+    // DÜZELTME: Bağlıysa 'Connected:', değilse 'Connect Wallet' yazacak.
+    const shortAddress = address ? `${address.slice(0, 6)}...${address.slice(-4)}` : 'Connect Wallet'; 
 
     return (
         <header className="header-container">
             <div className="header-top">
-                {/* LOGO GÖRSEL ALANI */}
                 <img 
                     src="/eqoschain_logo.png" 
                     alt="EQOSChain Logo" 
@@ -26,23 +24,21 @@ const Header = ({ currentView, setView, isConnected, address, handleConnectWalle
                     onClick={() => setView('My Profile')} 
                 />
                 
-                {/* CÜZDAN BAĞLANTI BUTONU */}
                 <div className="wallet-connector-area">
                     <button 
                         className="btn-primary" 
                         onClick={!isConnected ? handleConnectWallet : undefined} 
                     >
-                        {isConnected ? `Bağlı: ${shortAddress}` : 'Cüzdan Bağla'}
+                        {/* DÜZELTME: Bağlı ise 'Connected: ...' göster */}
+                        {isConnected ? `Connected: ${shortAddress}` : 'Connect Wallet'} 
                     </button>
                 </div>
             </div>
             
-            {/* Sekme Navigasyonu */}
             <nav className="navbar-tabs">
                 {views.map(view => (
                     <button
                         key={view.key}
-                        // 💥 KRİTİK DÜZELTME: currentView'in undefined olup olmadığı kontrol ediliyor 💥
                         className={`tab-button ${currentView && currentView.toLowerCase() === view.label.toLowerCase() ? 'active' : ''}`}
                         onClick={() => setView(view.label)} 
                     >
