@@ -1,28 +1,25 @@
-// pages/index.js (SON VERSİYON)
+// pages/index.js (FINAL & ENGLISH VERSION)
 import React, { useState, useEffect } from 'react';
 import useWeb3 from '../hooks/useWeb3'; 
-// Ethers import'u ve eski handlePayment fonksiyonu silindi!
 import Link from 'next/link';
 import dynamic from 'next/dynamic'; 
 
-// Bileşenleri import et
+// Components and Views
 import Header from '../components/Header';
 import MyProfileComponent from '../components/MyProfile'; 
-// Yeni bileşenler (Eksik import hatasını önlemek için dinamik yüklendi)
-const ProfilesTab = dynamic(() => Promise.resolve(({ children }) => <>{children}</>), { ssr: false });
-const ProWalletTab = dynamic(() => Promise.resolve(({ children }) => <>{children}</>), { ssr: false });
+const RefWalletTab = dynamic(() => Promise.resolve(({ children }) => <>{children}</>), { ssr: false });
 
 const API_BASE_URL = 'https://api.eqoschain.com'; 
 
-// --- YENİ: SOSYAL MEDYA FOOTER BİLEŞENİ ---
+// --- SOCIAL MEDIA FOOTER COMPONENT ---
 const SocialMediaFooter = () => (
     <div className="social-footer-container">
-        <h3>Bizi Takip Edin:</h3>
+        <h3>Follow Us:</h3>
         <div className="social-links">
-            <a href="TELEGRAM_LINKİN" target="_blank" rel="noopener noreferrer">
+            <a href="YOUR_TELEGRAM_LINK" target="_blank" rel="noopener noreferrer">
                 Telegram
             </a>
-            <a href="X_TWITTER_LINKİN" target="_blank" rel="noopener noreferrer">
+            <a href="YOUR_X_TWITTER_LINK" target="_blank" rel="noopener noreferrer">
                 X (Twitter)
             </a>
         </div>
@@ -30,41 +27,50 @@ const SocialMediaFooter = () => (
     </div>
 );
 
-// --- YENİ: REF WALLET BİLEŞENİ ---
-const RefWalletTab = () => (
+// --- REF WALLET COMPONENT ---
+const RefWalletTabContent = () => (
     <div style={{ padding: '30px', backgroundColor: '#2a2a2a', borderRadius: '8px', marginTop: '20px' }}>
-        <h3 style={{ color: '#f0b90b' }}>RefWallet (Davet Cüzdanı)</h3>
-        <p>Bu alanda yakında referans linkiniz, kazancınız ve davet kodunuzu kopyalama butonu yer alacaktır.</p>
+        <h3 style={{ color: '#f0b90b' }}>RefWallet (Referral Wallet)</h3>
+        <p>Your referral link, earnings, and code will be displayed here soon.</p>
     </div>
 );
 
-// --- ANA BİLEŞEN ---
+// --- Main Components ---
+
+const FollowButton = ({ followerAddress, targetAddress, onSuccess }) => {
+    const handleFollow = async () => {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/wallet/follow`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ followerAddress, targetAddress })
+            });
+            const data = await response.json();
+            if (response.ok) {
+                alert(`SUCCESS: ${data.message} 🎉`);
+                onSuccess(); 
+            } else {
+                alert(`ERROR: ${data.message}`);
+            }
+        } catch (error) {
+            alert("API connection error.");
+        }
+    };
+    return <button onClick={handleFollow} className="btn-follow">Follow (+1 EQOS)</button>;
+};
 
 const Home = () => {
-    // 💥 DÜZELTME: connectWallet yerine handleConnectWallet çekildi 💥
     const { handleConnectWallet, address, isConnected, profile, fetchProfile, proWallets, allProfiles, fetchAllData, handleContractCall, disconnect } = useWeb3();
     const [activeTab, setActiveTab] = useState('My Profile');
     
-    // Eski handlePayment fonksiyonu tamamen silinmiştir.
-
-    const FollowButton = ({ followerAddress, targetAddress, onSuccess }) => {
-        // ... (API'ye Follow isteği gönderme mantığı, değişmedi) ...
-        const handleFollow = async () => {
-            // ... (API'ye Follow isteği gönderme mantığı) ...
-        };
-        return <button onClick={handleFollow} className="btn-follow">Follow (+1 EQOS)</button>;
-    };
-
-
+    // TAB COMPONENTS (Using functions to keep them local)
     const ProfilesTabView = () => {
-        // ... (Modal/Aksiyon mantığı tekrar yazılmalıdır)
-        // Buradaki tüm handlePayment çağrılarını handleContractCall ile değiştirmen gerekiyor.
+        // NOTE: Donation/Boost button logic needs to be fully implemented with modals using handleContractCall
         return (
             <div style={{ marginTop: '20px' }}>
                <h3 style={{ borderBottom: '1px solid #333', paddingBottom: '10px', fontSize: '18px', color: '#f0f0f0' }}>Profiles (All Registered Wallets)</h3>
-               <p style={{color: '#999'}}>Bu bölümün ödeme mantığı, eski `handlePayment` yerine, `handleContractCall` ile güncellenmelidir.</p>
-               {/* Eski koddan gelen profiles listesi kullanılabilir */}
-                {allProfiles.length === 0 ? <p>No other profiles found yet...</p> : allProfiles.map(p => (
+               <p style={{color: '#999'}}>The payment logic for Boost/Donate must use `handleContractCall`.</p>
+               {allProfiles.length === 0 ? <p style={{color: '#999'}}>No other profiles found yet...</p> : allProfiles.map(p => (
                     <div key={p._id} className="profile-card" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#333' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                             <img src={p.profilePictureURL || 'placeholder.png'} alt="PFP" style={{ width: '30px', height: '30px', borderRadius: '50%' }} />
@@ -81,11 +87,9 @@ const Home = () => {
                                 />
                             )}
                             {p._id !== address && (
-                                // 💥 NOT: Buraya modal açma ve ardından handleContractCall çağırma mantığı entegre edilmelidir.
-                                <button className="btn-donate" style={{ marginLeft: '10px' }}>Donate</button>
+                                <button className="btn-donate action-button" style={{ marginLeft: '10px' }}>Donate</button>
                             )}
-                            
-                            <button className="btn-boost" style={{ marginLeft: '10px' }}>Boost</button>
+                            <button className="btn-boost action-button" style={{ marginLeft: '10px' }}>Boost</button>
                         </div>
                     </div>
                 ))}
@@ -101,9 +105,7 @@ const Home = () => {
                 alert("Minimum boost amount is $1.00.");
                 return;
             }
-            // 💥 KRİTİK DÜZELTME: handleContractCall kullanılıyor! 💥
             const success = await handleContractCall('Boost', boostAmount, address); 
-
             if (success) {
                 alert(`Profile boosted successfully for $${boostAmount.toFixed(2)} USD!`);
                 fetchProfile(address); 
@@ -114,7 +116,6 @@ const Home = () => {
             <div style={{ marginTop: '20px' }}>
                 <h3 style={{ borderBottom: '1px solid #333', paddingBottom: '10px', fontSize: '18px', color: '#f0f0f0' }}>My Profile Panel</h3>
                 {profile ? (
-                    // MyProfile.js bileşenini kullanıyoruz
                     <MyProfileComponent 
                         profile={profile} 
                         address={address} 
@@ -133,7 +134,6 @@ const Home = () => {
             <p style={{ fontSize: '14px', color: '#999' }}>Top 10 Wallets ranked by total USD received from Boost and Donate.</p>
             <div style={{ fontSize: '14px' }}>
                 {proWallets.map((w, index) => (
-                    // ... (ProWallet listesi JSX'i) ...
                     <div key={w._id} className={index < 3 ? 'profile-card prowallet-rank' : 'profile-card'} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', backgroundColor: '#333' }}>
                         <div style={{ fontWeight: w._id === address ? 'bold' : 'normal', fontSize: '14px', color: '#f0f0f0' }}>
                             <span style={{ color: '#f0b90b', marginRight: '5px' }}>#{index + 1}</span>: {w._id.slice(0, 15)}...{w._id.slice(-4)} 
@@ -150,7 +150,6 @@ const Home = () => {
         </div>
     );
 
-
     const renderTab = () => {
         if (!isConnected) return null;
         
@@ -160,7 +159,7 @@ const Home = () => {
             case 'Pro Wallet':
                 return <ProWalletTabView />;
             case 'RefWallet':
-                return <RefWalletTab />;
+                return <RefWalletTabContent />;
             case 'My Profile':
             default:
                 return <MyProfileTabView />;
@@ -170,15 +169,17 @@ const Home = () => {
     if (!isConnected) {
         return (
             <div className="container" style={{ textAlign: 'center' }}>
+                {/* Header çağrısı tek kaldı. Çift düğme sorunu çözüldü. */}
                 <Header isConnected={isConnected} handleConnectWallet={handleConnectWallet} address={address} setView={setActiveTab}/> 
                 <h2 style={{ marginTop: '50px', color: '#f0f0f0' }}>Welcome to EQOSChain</h2>
-                <p style={{ fontSize: '16px', color: '#ccc' }}>Tüm cüzdanlar ile bağlanarak EQOSChain ekosistemine katılın.</p>
-                <button 
+                <p style={{ fontSize: '16px', color: '#ccc' }}>Connect your wallet to join the EQOSChain ecosystem.</p>
+                {/* YALNIZCA BİR TANE BUYUK BUTON GÖSTERİYORUZ (Header'daki küçük butonu tamamlayan) */}
+                 <button 
                     onClick={() => handleConnectWallet()} 
                     className="btn-primary" 
                     style={{ padding: '12px 25px', fontSize: '18px', marginTop: '20px' }}
                 >
-                    Tüm Cüzdanları Bağla (BSC Network) 🔗
+                    Connect Wallet (BSC Network) 🔗
                 </button>
                 
                 <SocialMediaFooter />
@@ -192,7 +193,7 @@ const Home = () => {
                 currentView={activeTab} 
                 setView={setActiveTab} 
                 isConnected={isConnected} 
-                address={address} // address prop'u gönderildi
+                address={address}
                 handleConnectWallet={handleConnectWallet} 
             />
             
