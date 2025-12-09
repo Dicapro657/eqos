@@ -1,27 +1,40 @@
-// components/MyProfile.js (SON VERSİYON)
-// ... (ProfileStat bileşeni burada tanımlı olmalı)
+// components/MyProfile.js (FINAL & ENGLISH VERSION)
+import React from 'react';
+
+// Stat Kartı Bileşeni
+const ProfileStat = ({ title, value, unit }) => (
+    <div className="stat-card">
+        <span className="stat-title">{title}</span>
+        <span className="stat-value">{value} {unit}</span>
+    </div>
+);
 
 const MyProfile = ({ profile, address, boostAmount, setBoostAmount, handleSelfBoost }) => {
     if (!profile) {
-        return <div className="profile-loading">Profil verileri yükleniyor veya cüzdan bağlı değil...</div>;
+        return <div className="profile-loading">Profile data loading or wallet not connected...</div>;
     }
 
-    // Profil bilgileri...
+    // ... (Profil verileri ve Stat Kartları)
     const eqosPoints = profile.eqosPoints || 0;
     const eqosCoinAmount = profile.eqosCoinAmount || 0;
     const followersCount = profile.followers ? profile.followers.length : 0;
     const followingCount = profile.following ? profile.following.length : 0;
-    const referralCode = profile.referralCode || 'Oluşturulmadı';
+    const referralCode = profile.referralCode || 'Not Created';
     const referralCount = profile.referralCount || 0;
+
 
     return (
         <div className="profile-view">
-            <h2>Cüzdan Adresi: {address.slice(0, 8)}...{address.slice(-4)}</h2>
+            <h2>Wallet Address: {address.slice(0, 8)}...{address.slice(-4)}</h2>
             
             <div className="profile-stats-grid">
                 
-                {/* Havalı Stat Kartları */}
-                {/* ... (ProfileStat Bileşenleri) ... */}
+                <ProfileStat title="EQOS Points" value={eqosPoints} unit="PT" />
+                <ProfileStat title="EQOS Coin (Presale)" value={eqosCoinAmount} unit="EQOS" />
+                <ProfileStat title="Followers" value={followersCount} unit="People" />
+                <ProfileStat title="Following" value={followingCount} unit="People" />
+                <ProfileStat title="Referral Code" value={referralCode} unit="" />
+                <ProfileStat title="Referral Count" value={referralCount} unit="" />
             </div>
 
             <div style={{ marginTop: '25px', borderTop: '1px solid #333', paddingTop: '15px' }}>
@@ -37,7 +50,7 @@ const MyProfile = ({ profile, address, boostAmount, setBoostAmount, handleSelfBo
                 />
                 <button onClick={handleSelfBoost} className="action-button btn-boost" style={{ padding: '8px 15px' }}>
                     <img src="/icon_boost.png" alt="Boost Icon" className="button-icon" />
-                    <span>Boost (${boostAmount.toFixed(2)} USD)</span>
+                    <span>Boost Profile (${boostAmount.toFixed(2)} USD)</span>
                 </button>
             </div>
         </div>
